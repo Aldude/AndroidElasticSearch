@@ -3,12 +3,14 @@ package ca.ualberta.ssrg.movies;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import ca.ualberta.ssrg.androidelasticsearch.R;
@@ -75,11 +77,9 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		
-		
+		SearchThread thread = new SearchThread("*");
 
-		// Refresh the list when visible
-		// TODO: Search all
-		
+		thread.start();
 	}
 	
 	/** 
@@ -103,10 +103,10 @@ public class MainActivity extends Activity {
 	public void search(View view) {
 		movies.clear();
 
-		// TODO: Extract search query from text view
+        EditText editText = (EditText) findViewById(R.id.editText1);
 		
-		// TODO: Run the search thread
-		
+		SearchThread thread = new SearchThread(editText.getText().toString());
+        thread.start();
 	}
 	
 	/**
@@ -131,8 +131,18 @@ public class MainActivity extends Activity {
 
 
 	class SearchThread extends Thread {
-		// TODO: Implement search thread
-		
+		private String search;
+
+		public SearchThread(String search) {
+			this.search = search;
+		}
+
+		@Override
+		public void run() {
+			movies.clear();
+			movies.addAll(movieManager.searchMovies(search, null));
+			notifyUpdated();
+		}
 	}
 
 	
